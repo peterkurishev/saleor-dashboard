@@ -1,15 +1,18 @@
+import LeaveScreenDialog from "@saleor/components/LeaveScreenDialog";
 import NotFoundPage from "@saleor/components/NotFoundPage";
 import { WindowTitle } from "@saleor/components/WindowTitle";
 import useNavigator from "@saleor/hooks/useNavigator";
 import useNotifier from "@saleor/hooks/useNotifier";
 import useShop from "@saleor/hooks/useShop";
 import { commonMessages } from "@saleor/intl";
+import createDialogActionHandlers from "@saleor/utils/handlers/dialogActionHandlers";
 import createMetadataCreateHandler from "@saleor/utils/handlers/metadataCreateHandler";
 import {
   useMetadataUpdate,
   usePrivateMetadataUpdate
 } from "@saleor/utils/metadata/updateMetadata";
 import { useWarehouseList } from "@saleor/warehouses/queries";
+import { warehouseListPath } from "@saleor/warehouses/urls";
 import React from "react";
 import { useIntl } from "react-intl";
 
@@ -19,15 +22,25 @@ import ProductVariantCreatePage, {
 } from "../components/ProductVariantCreatePage";
 import { useVariantCreateMutation } from "../mutations";
 import { useProductVariantCreateQuery } from "../queries";
-import { productListUrl, productUrl, productVariantEditUrl } from "../urls";
+import {
+  productListUrl,
+  productUrl,
+  productVariantAddUrl,
+  ProductVariantAddUrlDialog,
+  ProductVariantAddUrlQueryParams,
+  productVariantEditUrl
+} from "../urls";
 
 interface ProductVariantCreateProps {
   productId: string;
+  params: ProductVariantAddUrlQueryParams;
 }
 
 export const ProductVariant: React.FC<ProductVariantCreateProps> = ({
-  productId
+  productId,
+  params
 }) => {
+  const { action } = params;
   const navigate = useNavigator();
   const notify = useNotifier();
   const shop = useShop();
@@ -68,6 +81,11 @@ export const ProductVariant: React.FC<ProductVariantCreateProps> = ({
   if (product === null) {
     return <NotFoundPage onBack={() => navigate(productListUrl())} />;
   }
+
+  const [openModal, closeModal] = createDialogActionHandlers<
+    ProductVariantAddUrlDialog,
+    ProductVariantAddUrlQueryParams
+  >(navigate, params => productVariantAddUrl(productId, params), params);
 
   const handleBack = () => navigate(productUrl(productId));
   const handleCreate = async (formData: ProductVariantCreatePageSubmitData) => {
@@ -126,11 +144,18 @@ export const ProductVariant: React.FC<ProductVariantCreateProps> = ({
         onBack={handleBack}
         onSubmit={handleSubmit}
         onVariantClick={handleVariantClick}
+        onWarehouseConfigure={() => openModal("leave-screen")}
         saveButtonBarState={variantCreateResult.status}
         warehouses={
           warehouses.data?.warehouses.edges.map(edge => edge.node) || []
         }
         weightUnit={shop?.defaultWeightUnit}
+      />
+      <LeaveScreenDialog
+        onSubmit={() => navigate(warehouseListPath)}
+        onClose={closeModal}
+        open={action === "leave-screen"}
+        confirmButtonState="default"
       />
     </>
   );

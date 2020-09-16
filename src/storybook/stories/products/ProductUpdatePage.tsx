@@ -36,6 +36,7 @@ const props: ProductUpdatePageProps = {
   onVariantAdd: () => undefined,
   onVariantShow: () => undefined,
   onVariantsAdd: () => undefined,
+  onWarehouseConfigure: () => undefined,
   placeholderImage,
   product,
   saveButtonBarState: "default",

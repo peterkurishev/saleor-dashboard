@@ -56,6 +56,7 @@ interface ProductVariantCreatePageProps {
   onBack: () => void;
   onSubmit: (data: ProductVariantCreatePageSubmitData) => void;
   onVariantClick: (variantId: string) => void;
+  onWarehouseConfigure: () => void;
 }
 
 const ProductVariantCreatePage: React.FC<ProductVariantCreatePageProps> = ({
@@ -69,7 +70,8 @@ const ProductVariantCreatePage: React.FC<ProductVariantCreatePageProps> = ({
   weightUnit,
   onBack,
   onSubmit,
-  onVariantClick
+  onVariantClick,
+  onWarehouseConfigure
 }) => {
   const intl = useIntl();
   const attributeInput = React.useMemo(
@@ -161,6 +163,7 @@ const ProductVariantCreatePage: React.FC<ProductVariantCreatePageProps> = ({
                 <ProductStocks
                   data={data}
                   disabled={disabled}
+                  hasVariants={true}
                   onFormDataChange={change}
                   errors={errors}
                   stocks={stocks}
@@ -183,6 +186,7 @@ const ProductVariantCreatePage: React.FC<ProductVariantCreatePageProps> = ({
                     triggerChange();
                     removeStock(id);
                   }}
+                  onWarehouseConfigure={onWarehouseConfigure}
                 />
                 <CardSpacer />
                 <Metadata data={data} onChange={changeMetadata} />
